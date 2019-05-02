@@ -1,41 +1,45 @@
 /* write to me at saurabhdubey097@gmail.com */
+#include<unistd.h>
+#include<stdio.h>
+#include<stdlib.h>
 #include <bits/stdc++.h>
+#include<conio.h>
 using namespace std;
 
-struct Process_Data
+struct Data_Working
 {
 	int Num;
-	int Pid;  //Process Id
-	int A_time; //Process Arrival Time
-	int B_time; //Process Bruest Time
-	int Priority; //Process Priority
-	int F_time; //Process Finish Time
-	int R_time; //Process Remaining  Time During Execution
-	int W_time; //Waiting Time
-	int S_time; //Process start Time
-	int Res_time;
+	int Process_ID;  
+	int timeofA; 
+	int timeofB; 
+	int pp; 
+	int finishtym; 
+	int remaining_tym; 
+	int waiting_time; 
+	int start_time; 
+	int rest_time;
 
 };
 
-struct Process_Data current;
-typedef struct Process_Data P_d ;
+struct Data_Working current;
+typedef struct Data_Working P_d ;
 
 bool idsort(const P_d& x , const P_d& y)
 {
-	return x.Pid < y.Pid;
+	return x.Process_ID < y.Process_ID;
 }
-/** Sorting on the base of arrival time if that match then on Priority of Priority also  match than on the base of Process Id**/
+
 bool arrivalsort( const P_d& x ,const P_d& y)
 {
-	if(x.A_time < y.A_time)
+	if(x.timeofA < y.timeofA)
 		return true;
-	else if(x.A_time > y.A_time)
+	else if(x.timeofA > y.timeofA)
 		return false;
-	if(x.Priority < y.Priority)
+	if(x.pp < y.pp)
 		return true;
-	else if(x.Priority > y.Priority)
+	else if(x.pp > y.pp)
 		return false;
-	if(x.Pid < y.Pid)
+	if(x.Process_ID < y.Process_ID)
 		return true;
 
 	return false;
@@ -46,16 +50,16 @@ bool Numsort( const P_d& x ,const P_d& y)
 {
 	return x.Num < y.Num;
 }
-/*Sorting on the base of Priority if that same then on the base of PID*/
+
 struct comPare
 {
 	bool operator()(const P_d& x ,const P_d& y)
 	{
-		if( x.Priority > y.Priority )
+		if( x.pp > y.pp )
 			return true;
-		else if( x.Priority < y.Priority )
+		else if( x.pp < y.pp )
 			return false;
-		if( x.Pid > y.Pid )
+		if( x.Process_ID > y.Process_ID )
 			return true;
 
 		return false;
@@ -64,12 +68,12 @@ struct comPare
 	
 };
 
-/**To check the Input **/
+
 void my_check(vector<P_d> mv)
 {
 	for(unsigned int i= 0; i < mv.size() ;i++)
 	{
-		cout<<" Pid :"<<mv[i].Pid<<" _time : "<<mv[i].A_time<<" B_time : "<<mv[i].B_time<<" Priority : "<<mv[i].Priority<<endl;
+		cout<<" PROCESS id :"<<mv[i].Process_ID<<" _time : "<<mv[i].timeofA<<" timeofB : "<<mv[i].timeofB<<" pp : "<<mv[i].pp<<endl;
 	}
 
 }
@@ -80,74 +84,78 @@ int main()
 	vector< P_d > input;
 	vector<P_d> input_copy;
 	P_d temp;
-	int pq_process = 0; // for PQ process
-	int rq_process = 0; // for RQ process
-	int A_time;
-	int B_time;
-	int Pid;
-	int Priority;
+	int pq_process = 0; 
+	int rq_process = 0; 
+	int timeofA;
+	int timeofB;
+	int Process_ID;
+	int pp;
 	int n;
 	int clock;
 	int total_exection_time = 0;
+	system("Color B5");
+	cout<<"Enter Number of processes: \n";
 	cin>>n;
 	for( i= 0; i< n; i++ )
-	{
-		cin>>Pid>>A_time>>B_time>>Priority;
+	
+	{  system("Color 0C");
+	 cout<<"Enter the process id,Arrival time, Burst time and priority:\n";
+	    
+		cin>>Process_ID>>timeofA>>timeofB>>pp;
 		temp.Num = i+1;
-		temp.A_time = A_time;
-		temp.B_time = B_time;
-		temp.R_time = B_time;
-		temp.Pid = Pid;
-		temp.Priority = Priority;
+		temp.timeofA = timeofA;
+		temp.timeofB = timeofB;
+		temp.remaining_tym = timeofB;
+		temp.Process_ID = Process_ID;
+		temp.pp = pp;
 		input.push_back(temp);
 	}
 	input_copy = input;
 	sort( input.begin(), input.end(), arrivalsort );
-    //cout<<"arrivalsort : "<<endl;
-    //my_check( input ); // To check the sort unomment it
-    total_exection_time = total_exection_time + input[0].A_time;
+    
+    total_exection_time = total_exection_time + input[0].timeofA;
     for( i= 0 ;i< n; i++ )
     {
-    	if( total_exection_time >= input[i].A_time )
+    	if( total_exection_time >= input[i].timeofA )
     	{
-    		total_exection_time = total_exection_time +input[i].B_time;
+    		total_exection_time = total_exection_time +input[i].timeofB;
     	}
     	else
     	{
-    		int diff = (input[i].A_time - total_exection_time);
-    		total_exection_time = total_exection_time + diff + B_time;
+    		int diff = (input[i].timeofA - total_exection_time);
+    		total_exection_time = total_exection_time + diff + timeofB;
 
     	}
     }
 
-	int Ghant[total_exection_time]={0}; //Ghant Chart
+	int Ghant[total_exection_time]={0}; 
 	for( i= 0; i< total_exection_time; i++ )
 	{
 		Ghant[i]=-1;
 	}
-	//cout<<"total_exection_time : "<<total_exection_time<<endl;
+	
 
-	priority_queue < P_d ,vector<Process_Data> ,comPare> pq; //Priority Queue PQ
+	priority_queue < P_d ,vector<Data_Working> ,comPare> pq; 
 
-	queue< P_d > rq; //Round Robin Queue RQ
-	int cpu_state = 0; //idle if 0 then Idle if 1 the Busy
-	int quantum = 4 ; //Time Quantum
-	current.Pid = -2;
-	current.Priority = 999999;
+	queue< P_d > rq;
+	int cpu_state = 0; 
+	int quantum = 4 ; 
+	current.Process_ID= -2;
+	current.pp = 999999;
 
 	for ( clock = 0; clock< total_exection_time; clock++ )
 	{
-		/**Insert the process with same Arrival time in Priority Queue**/
+		
 		for( int j = 0; j< n ; j++ )
 		{
-			if(clock == input[j].A_time)
+			if(clock == input[j].timeofA)
 			{
 				pq.push(input[j]);
 			}
 		}
 		
 
-		if(cpu_state == 0) //If CPU idle
+		if(cpu_state == 0) 
 		{
 			if(!pq.empty())
 			{
@@ -170,15 +178,15 @@ int main()
 		{
 			if(pq_process == 1 && (!pq.empty()))
 			{
-				if(pq.top().Priority < current.Priority ) //If new process has high priority
+				if(pq.top().pp < current.pp ) 
 				{
-					rq.push(current); //push current in RQ
+					rq.push(current); 
 					current = pq.top();
 					pq.pop();
 					quantum = 4; 
 				}
 			}
-			else if(rq_process == 1 && (!pq.empty())) //If process is from RQ and new process come  in PQ
+			else if(rq_process == 1 && (!pq.empty())) 
 			{
 				rq.push(current);
 				current = pq.top();
@@ -192,25 +200,25 @@ int main()
 		}
 
 
-		if(current.Pid != -2) // Process Execution
+		if(current.Process_ID != -2) 
 		{
-			current.R_time--;
+			current.remaining_tym--;
 			quantum--;
-			Ghant[clock] = current.Pid;
-			if(current.R_time == 0) //If process Finish
+			Ghant[clock] = current.Process_ID;
+			if(current.remaining_tym == 0) 
 			{
 				cpu_state = 0 ;
 				quantum = 4 ;
-				current.Pid = -2;
-				current.Priority = 999999;
+				current.Process_ID = -2;
+				current.pp = 999999;
 				rq_process = 0;
 				pq_process = 0;
 			}
-			else if(quantum == 0 ) //If time Qunatum of a current running process Finish
+			else if(quantum == 0 ) 
 			{
 				rq.push(current);
-				current.Pid = -2;
-				current.Priority = 999999;
+				current.Process_ID = -2;
+				current.pp = 999999;
 				rq_process = 0;
 				pq_process = 0;
 				cpu_state=0;
@@ -230,7 +238,7 @@ int main()
 		{
 			if(Ghant[k]==i+1)
 			{
-				input[i].F_time=k+1;
+				input[i].finishtym=k+1;
 				break;
 
 			}
@@ -243,7 +251,7 @@ int main()
 
 			if(Ghant[k]==i+1)
 			{
-				input[i].S_time=k;
+				input[i].start_time=k;
 				break;
 			}
 		}
@@ -253,16 +261,20 @@ int main()
 
 	for(int i=0;i<n;i++)
 	{
-		input[i].Res_time=input[i].S_time-input[i].A_time;
-		input[i].W_time=(input[i].F_time-input[i].A_time)-input[i].B_time;
+		input[i].rest_time=input[i].start_time-input[i].timeofA;
+		input[i].waiting_time=(input[i].finishtym-input[i].timeofA)-input[i].timeofB;
 
 	}
 	
+    //system("Color C1");
+
+	 system("Color F2");
+	 cout<<"::::Process_id Response_time Finish_time Waiting_Time ::::\n";
 	for(int i=0;i<n;i++)
-	{
-		cout<<input[i].Pid<<" "<<input[i].Res_time<<" "<<input[i].F_time<<" "<<input[i].W_time<<endl;
+	{   cout<<"      ";
+	system("Color 5A");
+	cout<<input[i].Process_ID<<"         "<<input[i].rest_time<<"            "<<input[i].finishtym<<"             "<<input[i].waiting_time<<endl;
 		
 	}	
 	return 0;
 }
-
